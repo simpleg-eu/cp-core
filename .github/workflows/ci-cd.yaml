@@ -26,7 +26,7 @@ jobs:
             src:
               - 'src/**'
               - 'Cargo.toml'
-              - '.github/workflows/cd.yaml'
+              - '.github/workflows/ci-cd.yaml'
             test:
               - 'test_data/**'
               - 'tests/**'
