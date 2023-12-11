@@ -12,6 +12,15 @@ pub struct Error {
     message: String,
 }
 
+impl Error {
+    pub fn new(error_kind: String, message: String) -> Self {
+        Self {
+            error_kind,
+            message,
+        }
+    }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}: {}", self.error_kind, self.message)
@@ -20,6 +29,15 @@ impl Display for Error {
 
 impl From<serde_yaml::Error> for Error {
     fn from(value: serde_yaml::Error) -> Self {
+        Self {
+            error_kind: SERIALIZATION_FAILURE.to_string(),
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(value: serde_json::Error) -> Self {
         Self {
             error_kind: SERIALIZATION_FAILURE.to_string(),
             message: value.to_string(),
