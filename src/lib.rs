@@ -4,5 +4,6 @@
 
 pub mod config_reader;
 pub mod error;
-pub mod secrets;
 mod error_kind;
+pub mod secrets;
+pub mod test_base;

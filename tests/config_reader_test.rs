@@ -6,10 +6,7 @@ use serde_yaml::Value;
 
 use cp_core::config_reader::ConfigReader;
 use cp_core::error::Error;
-
-use crate::test_base::get_test_data_path;
-
-mod test_base;
+use cp_core::test_base::get_test_data_path;
 
 #[test]
 fn get_config_existing_config_file_returns() {

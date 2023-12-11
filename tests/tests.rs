@@ -3,4 +3,3 @@
  */
 
 pub mod secrets;
-pub mod test_base;
