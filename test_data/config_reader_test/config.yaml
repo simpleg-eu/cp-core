@@ -1,0 +1,5 @@
+Config:
+  Example:
+    InnerValue: 1234
+    InnerBool: true
+    InnerString: "yes"
