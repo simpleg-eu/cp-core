@@ -26,11 +26,11 @@ jobs:
             src:
               - 'src/**'
               - 'Cargo.toml'
+              - '.github/workflows/cd.yaml'
             test:
               - 'test_data/**'
               - 'tests/**'
-              - '.github/workflows/ci-cd.yml'
-              - '.github/workflows/ci-only.yml'
+              - '.github/workflows/ci-only.yaml'
   ci:
     needs: changes
     runs-on: ubuntu-latest
@@ -64,6 +64,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Replace placeholder version
+        run: |
+          sed -i 's/5123.0.0/${{ vars.MAJOR_VERSION }}.${{ vars.MINOR_VERSION }}.${{ env.PATCH_VERSION }}/' ./Cargo.toml
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
