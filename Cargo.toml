@@ -1,6 +1,6 @@
 [package]
 name = "cp-core"
-version = "0.1.0"
+version = "5123.0.0"
 edition = "2021"
 description = "Core utilities for Cuplan"
 license = "MIT"
