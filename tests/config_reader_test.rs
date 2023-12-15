@@ -6,11 +6,11 @@ use serde_yaml::Value;
 
 use cp_core::config_reader::ConfigReader;
 use cp_core::error::Error;
-use cp_core::test_base::get_test_data_path;
+use cp_core::test_base::get_integration_test_data_path;
 
 #[test]
 fn get_config_existing_config_file_returns() {
-    let mut test_data_path = get_test_data_path(file!());
+    let mut test_data_path = get_integration_test_data_path(file!());
     test_data_path.push("config.yaml");
     let config_reader: ConfigReader = ConfigReader::default();
 
