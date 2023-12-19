@@ -2,22 +2,24 @@
  * Copyright (c) Gabriel Amihalachioaie, SimpleG 2023.
  */
 
-use serde::Deserialize;
 use std::process::Command;
+
+use serde::Deserialize;
 
 use crate::error::Error;
 use crate::error_kind::SECRETS_MANAGER_FAILURE;
 use crate::secrets::secrets_manager::SecretsManager;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct BitwardenSecret {
     pub id: String,
-    pub organizationId: String,
-    pub projectId: String,
+    pub organization_id: String,
+    pub project_id: String,
     pub key: String,
     pub value: String,
-    pub creationDate: String,
-    pub revisionDate: String,
+    pub creation_date: String,
+    pub revision_date: String,
 }
 
 pub struct BitwardenSecretsManager {
