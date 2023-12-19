@@ -66,3 +66,31 @@ impl SecretsManager for BitwardenSecretsManager {
         Ok(secret)
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    use crate::config_reader::ConfigReader;
+    use crate::secrets::bitwarden_secrets_manager::BitwardenSecretsManager;
+    use crate::secrets::secrets_manager::SecretsManager;
+    use crate::test_base::get_unit_test_data_path;
+
+    #[test]
+    fn get_secret_existing_secret_returns_expected_string() {
+        let expected_string: String = "le_secret :)".to_string();
+        let config_reader = ConfigReader::default();
+        let mut config_path = get_unit_test_data_path(file!());
+        config_path.push("config.yaml");
+        let config_result = config_reader.read(config_path).unwrap();
+        let access_token = std::env::var("SECRETS_MANAGER_ACCESS_TOKEN").unwrap();
+        let secret_id = config_result
+            .get("ExampleSecret")
+            .unwrap()
+            .as_str()
+            .unwrap();
+        let secrets_manager: BitwardenSecretsManager = BitwardenSecretsManager::new(access_token);
+
+        let result = secrets_manager.get_secret(secret_id).unwrap();
+
+        assert_eq!(expected_string, result);
+    }
+}
