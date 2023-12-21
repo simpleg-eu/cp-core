@@ -19,6 +19,14 @@ impl Error {
             message,
         }
     }
+
+    pub fn error_kind(&self) -> &str {
+        self.error_kind.as_str()
+    }
+
+    pub fn message(&self) -> &str {
+        self.message.as_str()
+    }
 }
 
 impl Display for Error {
