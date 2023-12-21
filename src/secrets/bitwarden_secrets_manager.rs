@@ -3,12 +3,18 @@
  */
 
 use std::process::Command;
+use std::time::Duration;
 
+use rand::{thread_rng, Rng};
 use serde::Deserialize;
 
 use crate::error::Error;
 use crate::error_kind::SECRETS_MANAGER_FAILURE;
 use crate::secrets::secrets_manager::SecretsManager;
+
+const MAX_RETRIES: usize = 5;
+const MIN_SLEEP_BETWEEN_TRIES_IN_MILLISECONDS: u64 = 100;
+const MAX_SLEEP_BETWEEN_TRIES_IN_MILLISECONDS: u64 = 1000;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -30,10 +36,12 @@ impl BitwardenSecretsManager {
     pub fn new(access_token: String) -> Self {
         Self { access_token }
     }
-}
 
-impl SecretsManager for BitwardenSecretsManager {
-    fn get_secret(&self, secret_id: &str) -> Result<String, Error> {
+    fn get_secret_after_too_many_requests_failure(
+        &self,
+        secret_id: &str,
+        count: usize,
+    ) -> Result<String, Error> {
         let result = Command::new("bws")
             .arg("get")
             .arg("secret")
@@ -51,10 +59,27 @@ impl SecretsManager for BitwardenSecretsManager {
                     }
                 } else {
                     return match String::from_utf8(output.stderr) {
-                        Ok(error_message) => Err(Error::new(
-                            SECRETS_MANAGER_FAILURE.to_string(),
-                            format!("failed to run 'bws': {}", error_message),
-                        )),
+                        Ok(error_message) => {
+                            if error_message.contains("[429 Too Many Requests]")
+                                && count < MAX_RETRIES
+                            {
+                                let mut rng = thread_rng();
+                                let sleep_for_milliseconds = rng.gen_range(
+                                    MIN_SLEEP_BETWEEN_TRIES_IN_MILLISECONDS
+                                        ..MAX_SLEEP_BETWEEN_TRIES_IN_MILLISECONDS,
+                                );
+                                std::thread::sleep(Duration::from_millis(sleep_for_milliseconds));
+                                return self.get_secret_after_too_many_requests_failure(
+                                    secret_id,
+                                    count + 1,
+                                );
+                            }
+
+                            Err(Error::new(
+                                SECRETS_MANAGER_FAILURE.to_string(),
+                                format!("failed to run 'bws': {}", error_message),
+                            ))
+                        }
                         Err(error) => Err(Error::new(
                             SECRETS_MANAGER_FAILURE.to_string(),
                             format!("failed to read 'bws' error: {}", error),
@@ -66,6 +91,12 @@ impl SecretsManager for BitwardenSecretsManager {
         };
 
         Ok(secret)
+    }
+}
+
+impl SecretsManager for BitwardenSecretsManager {
+    fn get_secret(&self, secret_id: &str) -> Result<String, Error> {
+        self.get_secret_after_too_many_requests_failure(secret_id, 0usize)
     }
 }
 
@@ -94,5 +125,12 @@ pub mod tests {
         let result = secrets_manager.get_secret(secret_id).unwrap();
 
         assert_eq!(expected_string, result);
+    }
+
+    #[test]
+    fn get_secret_repeatedly_does_not_break() {
+        for i in 0..10 {
+            get_secret_existing_secret_returns_expected_string();
+        }
     }
 }
