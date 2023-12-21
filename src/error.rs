@@ -13,10 +13,10 @@ pub struct Error {
 }
 
 impl Error {
-    pub fn new(error_kind: String, message: String) -> Self {
+    pub fn new(error_kind: impl Into<String>, message: impl Into<String>) -> Self {
         Self {
-            error_kind,
-            message,
+            error_kind: error_kind.into(),
+            message: message.into(),
         }
     }
 
