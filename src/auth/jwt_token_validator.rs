@@ -96,6 +96,11 @@ impl TokenValidator for JwtTokenValidator {
     }
 }
 
+/// Tries to get a `JwkSet` by reaching to the specified `jwks_uri`.
+///
+/// # Arguments
+///
+/// * `jwks_uri` - URI to be reached for retrieving the `JwkSet`.
 pub async fn try_get_jwks(jwks_uri: &str) -> Result<JwkSet, Error> {
     let response = ok_or_return_error!(
         reqwest::get(jwks_uri).await,

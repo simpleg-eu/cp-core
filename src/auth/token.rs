@@ -4,4 +4,8 @@
 
 use std::fmt::Debug;
 
+#[cfg(test)]
+use mockall::automock;
+
+#[cfg_attr(test, automock)]
 pub trait Token: Debug {}

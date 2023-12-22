@@ -27,6 +27,8 @@ reqwest = { version = "0.11", features = ["json"], optional = true }
 
 tokio = { version = "1", features = ["full"] }
 
+mockall = "0.12"
+
 [features]
 
 auth = ["dep:axum", "dep:jsonwebtoken", "dep:reqwest"]
