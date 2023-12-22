@@ -16,3 +16,13 @@ macro_rules! ok_or_return_error {
         }
     };
 }
+
+#[macro_export]
+macro_rules! some_or_return_error {
+    ($expression: expr, $error_kind: expr, $error_message: expr) => {
+        match $expression {
+            Some(value) => value,
+            None => return Err(Error::new($error_kind, $error_message)),
+        }
+    };
+}

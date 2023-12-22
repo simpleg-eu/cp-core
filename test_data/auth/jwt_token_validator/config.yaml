@@ -1,0 +1,7 @@
+TokenValidator:
+  JwksUri: "https://simpleg.eu.auth0.com/.well-known/jwks.json"
+  Issuers:
+    - "https://simpleg.eu.auth0.com/"
+  Audience:
+    - "cp-config"
+ExpiredTokenSecret: "f587b3d5-96fb-47b1-8cd6-b0e00108c253"

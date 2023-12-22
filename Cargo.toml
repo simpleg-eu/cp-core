@@ -16,3 +16,17 @@ serde_json = "1.0"
 log = "0.4"
 
 rand = "0.8"
+
+# Authorization
+
+axum = { version = "0.7", optional = true }
+jsonwebtoken = { version = "9.2", optional = true }
+reqwest = { version = "0.11", features = ["json"], optional = true }
+
+[dev-dependencies]
+
+tokio = { version = "1", features = ["full"] }
+
+[features]
+
+auth = ["dep:axum", "dep:jsonwebtoken", "dep:reqwest"]
