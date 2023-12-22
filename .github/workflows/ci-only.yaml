@@ -27,4 +27,4 @@ jobs:
           chmod +x bws
           export PATH=$PATH:$PWD
           cd ../
-          cargo test
+          cargo test --all-features
