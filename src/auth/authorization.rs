@@ -11,6 +11,8 @@ use crate::auth::token_validator::TokenValidator;
 use crate::error::Error;
 use crate::{ok_or_return_error, some_or_return_error};
 
+pub const AUTHORIZATION_HEADER: &str = "Authorization";
+
 pub struct Authorization {
     token_validator: Arc<dyn TokenValidator + Send + Sync>,
 }
@@ -33,7 +35,7 @@ impl Authorization {
     /// * `Err` - If the validation failed.
     pub async fn validate(&self, headers: HeaderMap) -> Result<(), Error> {
         let authorization_value = some_or_return_error!(
-            headers.get("Authorization"),
+            headers.get(AUTHORIZATION_HEADER),
             INVALID_HEADERS,
             "'Authorization' header is missing"
         );
@@ -67,7 +69,7 @@ pub mod tests {
     use axum::http::{HeaderMap, HeaderValue};
     use mockall::predicate::eq;
 
-    use crate::auth::authorization::Authorization;
+    use crate::auth::authorization::{Authorization, AUTHORIZATION_HEADER};
     use crate::auth::token::MockToken;
     use crate::auth::token_validator::MockTokenValidator;
 
@@ -88,7 +90,7 @@ pub mod tests {
         let authorization_header =
             HeaderValue::from_str(format!("Bearer {}", expected_token).as_str())
                 .expect("expected 'authorization' HeaderValue");
-        headers.append("Authorization", authorization_header);
+        headers.append(AUTHORIZATION_HEADER, authorization_header);
         let authorization = Authorization::new(Arc::new(token_validator_mock));
 
         let result = authorization.validate(headers).await;
