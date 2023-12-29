@@ -4,14 +4,30 @@
 
 use std::sync::Arc;
 
-use axum::http::HeaderMap;
+use axum::http::{HeaderMap, StatusCode};
 
-use crate::auth::error_kind::INVALID_HEADERS;
+use crate::auth::error_kind::{INVALID_HEADERS, INVALID_TOKEN};
 use crate::auth::token_validator::TokenValidator;
 use crate::error::Error;
 use crate::{ok_or_return_error, some_or_return_error};
 
 pub const AUTHORIZATION_HEADER: &str = "Authorization";
+
+#[macro_export]
+macro_rules! authorize {
+    ($authorization: expr, $headers: expr) => {
+        match state.authorization.validate(headers.clone()).await {
+            Ok(_) => (),
+            Err(error) => {
+                return if error.error_kind() == INVALID_TOKEN {
+                    Err((StatusCode::UNAUTHORIZED, format!("{}", error)))
+                } else {
+                    Err((StatusCode::BAD_REQUEST, format!("{}", error)))
+                }
+            }
+        }
+    };
+}
 
 #[derive(Clone)]
 pub struct Authorization {
