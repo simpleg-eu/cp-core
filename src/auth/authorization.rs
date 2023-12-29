@@ -53,20 +53,20 @@ impl Authorization {
     pub async fn validate(&self, headers: HeaderMap) -> Result<(), Error> {
         let authorization_value = some_or_return_error!(
             headers.get(AUTHORIZATION_HEADER),
-            INVALID_HEADERS,
+            INVALID_TOKEN,
             "'Authorization' header is missing"
         );
 
         let authorization = ok_or_return_error!(
             authorization_value.to_str(),
-            INVALID_HEADERS,
+            INVALID_TOKEN,
             "could not read 'Authorization' header as string"
         );
 
         // skip 'Bearer '
         if authorization.len() < 7 {
             return Err(Error::new(
-                INVALID_HEADERS,
+                INVALID_TOKEN,
                 "'Authorization' header value is invalid",
             ));
         }
