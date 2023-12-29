@@ -3,7 +3,7 @@
  */
 
 pub mod authorization;
-mod error_kind;
+pub mod error_kind;
 mod jwt_token;
 pub mod jwt_token_validator;
 pub mod token;
