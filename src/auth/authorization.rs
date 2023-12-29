@@ -13,6 +13,7 @@ use crate::{ok_or_return_error, some_or_return_error};
 
 pub const AUTHORIZATION_HEADER: &str = "Authorization";
 
+#[derive(Clone)]
 pub struct Authorization {
     token_validator: Arc<dyn TokenValidator + Send + Sync>,
 }
