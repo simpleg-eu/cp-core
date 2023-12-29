@@ -121,7 +121,7 @@ pub async fn try_get_jwks(jwks_uri: &str) -> Result<JwkSet, Error> {
 pub mod tests {
     use std::path::PathBuf;
 
-    use crate::auth::error_kind::MALFORMED_TOKEN;
+    use crate::auth::error_kind::{INVALID_TOKEN, MALFORMED_TOKEN};
     use crate::auth::jwt_token_validator::{try_get_jwks, JwtTokenValidator};
     use crate::auth::token_validator::TokenValidator;
     use crate::config_reader::ConfigReader;
@@ -184,7 +184,7 @@ pub mod tests {
             .validate(expired_token.as_str())
             .expect_err("expected validation failure due to token having to be expired");
 
-        assert_eq!(MALFORMED_TOKEN, error.error_kind());
+        assert_eq!(INVALID_TOKEN, error.error_kind());
         assert!(error.message().contains("failed to validate token"));
     }
 
