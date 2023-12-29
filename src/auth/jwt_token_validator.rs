@@ -10,7 +10,7 @@ use jsonwebtoken::jwk::{AlgorithmParameters, JwkSet};
 use jsonwebtoken::{decode, decode_header, Algorithm, DecodingKey, Validation};
 use serde_json::Value;
 
-use crate::auth::error_kind::{JWKS_RETRIEVAL_FAILURE, MALFORMED_TOKEN};
+use crate::auth::error_kind::{INVALID_TOKEN, JWKS_RETRIEVAL_FAILURE, MALFORMED_TOKEN};
 use crate::auth::jwt_token::JwtToken;
 use crate::auth::token::Token;
 use crate::auth::token_validator::TokenValidator;
@@ -88,7 +88,7 @@ impl TokenValidator for JwtTokenValidator {
 
         let decoded_token = ok_or_return_error!(
             decode::<HashMap<String, Value>>(token, &decoding_key, &validation),
-            MALFORMED_TOKEN,
+            INVALID_TOKEN,
             "failed to validate token: "
         );
 
