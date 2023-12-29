@@ -16,7 +16,7 @@ pub const AUTHORIZATION_HEADER: &str = "Authorization";
 #[macro_export]
 macro_rules! authorize {
     ($authorization: expr, $headers: expr) => {
-        match state.authorization.validate(headers.clone()).await {
+        match $authorization.validate($headers.clone()).await {
             Ok(_) => (),
             Err(error) => {
                 return if error.error_kind() == INVALID_TOKEN {
