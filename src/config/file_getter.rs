@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use serde::de::DeserializeOwned;
 use serde_yaml::Value;
 
 use crate::{
@@ -60,7 +61,7 @@ impl FileGetter {
 }
 
 impl Getter for FileGetter {
-    fn get(&mut self, file_path: &str, key: &str) -> Result<Value, Error> {
+    fn get<T: DeserializeOwned>(&mut self, file_path: &str, key: &str) -> Result<T, Error> {
         let value = match self.cache.get(file_path) {
             Some(value) => value,
             None => {
@@ -75,7 +76,12 @@ impl Getter for FileGetter {
 
         let keys: Vec<&str> = key.split(KEY_SPLIT).collect();
 
-        let value = FileGetter::inner_value(value, keys.as_slice(), 0usize)?;
+        let serialized_value = FileGetter::inner_value(value, keys.as_slice(), 0usize)?;
+
+        let value = match serde_yaml::from_value::<T>(serialized_value) {
+            Ok(value) => value,
+            Err(error) => return Err(error.into()),
+        };
 
         return Ok(value);
     }
@@ -109,12 +115,9 @@ pub mod tests {
         let expected_value = "yes";
         let mut getter = get_getter();
 
-        let result = serde_yaml::from_value::<String>(
-            getter
-                .get("application.yaml", "Root")
-                .expect("expected a 'Value' got an error instead"),
-        )
-        .expect("expected a 'String' got an error instead");
+        let result = getter
+            .get::<String>("application.yaml", "Root")
+            .expect("expected a 'String' got an error instead");
 
         assert_eq!(expected_value, result);
     }
@@ -124,12 +127,9 @@ pub mod tests {
         let expected_value = true;
         let mut getter = get_getter();
 
-        let result = serde_yaml::from_value::<bool>(
-            getter
-                .get("application.yaml", "Example:Yeah")
-                .expect("expected a 'Value' got an error instead"),
-        )
-        .expect("expected a 'bool' got an error instead");
+        let result = getter
+            .get::<bool>("application.yaml", "Example:Yeah")
+            .expect("expected a 'bool' got an error instead");
 
         assert_eq!(expected_value, result);
     }
@@ -137,7 +137,7 @@ pub mod tests {
     #[tokio::test]
     pub async fn get_not_existing_key_returns_error() {
         let mut getter = get_getter();
-        let result = getter.get("application.yaml", "Lmao");
+        let result = getter.get::<bool>("application.yaml", "Lmao");
 
         assert!(result.is_err());
         assert_eq!(NOT_FOUND, result.unwrap_err().error_kind());
@@ -146,7 +146,7 @@ pub mod tests {
     #[tokio::test]
     pub async fn get_not_existing_file_returns_error() {
         let mut getter = get_getter();
-        let result = getter.get("loooool.yaml", "yes");
+        let result = getter.get::<bool>("loooool.yaml", "yes");
 
         assert!(result.is_err());
         assert_eq!(NOT_FOUND, result.unwrap_err().error_kind());
