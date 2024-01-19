@@ -4,7 +4,9 @@
 
 use std::fmt::{Display, Formatter};
 
-use crate::error_kind::{SERIALIZATION_FAILURE, REQUEST_FAILURE};
+use zip::result::ZipError;
+
+use crate::error_kind::{SERIALIZATION_FAILURE, REQUEST_FAILURE, COMPRESSION_FAILURE};
 
 #[derive(Debug, Clone, PartialOrd, PartialEq)]
 pub struct Error {
@@ -66,6 +68,15 @@ impl From<reqwest::Error> for Error {
     fn from(value: reqwest::Error) -> Self {
         Self {
             error_kind: REQUEST_FAILURE.to_string(),
+            message: value.to_string()
+        }
+    }
+}
+
+impl From<ZipError> for Error {
+    fn from(value: ZipError) -> Self {
+        Self {
+            error_kind: COMPRESSION_FAILURE.to_string(),
             message: value.to_string()
         }
     }
