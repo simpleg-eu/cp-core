@@ -7,3 +7,4 @@ pub mod extractor;
 pub mod getter;
 pub mod http_downloader;
 pub mod zip_extractor;
+pub mod file_getter;

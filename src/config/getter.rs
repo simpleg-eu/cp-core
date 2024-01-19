@@ -2,6 +2,8 @@
  * Copyright (c) Gabriel Amihalachioaie, SimpleG 2024.
  */
 
+use serde::de::DeserializeOwned;
+
 use crate::error::Error;
 
 /// `Getter` offers the ability to get configuration values from previously
@@ -19,5 +21,5 @@ pub trait Getter {
     ///
     /// * __Ok__(`T`) - the configuration value with the specified type.
     /// * __Err__(`Error`) - error indicating what went wrong.
-    fn get<T>(file_path: &str, key: &str) -> Result<T, Error>;
+    fn get<T: DeserializeOwned>(&mut self, file_path: &str, key: &str) -> Result<T, Error>;
 }

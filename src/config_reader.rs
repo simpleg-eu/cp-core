@@ -6,7 +6,7 @@ use std::path::PathBuf;
 
 use serde_yaml::Value;
 
-use crate::error::Error;
+use crate::{error::Error, error_kind::NOT_FOUND};
 
 #[derive(Default)]
 pub struct ConfigReader {}
@@ -20,7 +20,13 @@ impl ConfigReader {
                 Ok(value) => Ok(value),
                 Err(error) => Err(error.into()),
             },
-            Err(error) => Err(error.into()),
+            Err(error) => {
+                if error.kind().to_string().contains("entity not found") {
+                    Err(Error::new(NOT_FOUND, error.to_string()))
+                } else {
+                    Err(error.into())
+                }
+            }
         }
     }
 }
