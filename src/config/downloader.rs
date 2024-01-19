@@ -15,7 +15,7 @@ pub trait Downloader {
     ///
     /// # Returns
     ///
-    /// * __Ok__(`Vec<u8>`) - configuration package bytes.
+    /// * __Ok__(`Vec<u8>`) - configuration package's bytes.
     /// * __Err__(`Error`) - error indicating what went wrong.
     async fn download(
         &self,
