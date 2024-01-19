@@ -4,7 +4,7 @@
 
 use std::fmt::{Display, Formatter};
 
-use crate::error_kind::SERIALIZATION_FAILURE;
+use crate::error_kind::{SERIALIZATION_FAILURE, REQUEST_FAILURE};
 
 #[derive(Debug, Clone, PartialOrd, PartialEq)]
 pub struct Error {
@@ -58,6 +58,15 @@ impl From<std::io::Error> for Error {
         Self {
             error_kind: value.kind().to_string(),
             message: value.to_string(),
+        }
+    }
+}
+
+impl From<reqwest::Error> for Error {
+    fn from(value: reqwest::Error) -> Self {
+        Self {
+            error_kind: REQUEST_FAILURE.to_string(),
+            message: value.to_string()
         }
     }
 }
