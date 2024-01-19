@@ -1,5 +1,3 @@
-use std::io::BufReader;
-
 use crate::{config::extractor::Extractor, error::Error};
 
 #[derive(Default)]
