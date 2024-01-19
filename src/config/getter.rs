@@ -11,7 +11,7 @@ pub trait Getter {
     ///
     /// # Arguments
     ///
-    /// * `filePath` - string indicating the file path relative to
+    /// * `file_path` - string indicating the file path relative to
     /// the configuration's extractor target path.
     /// * `key` - index that supports nesting by using ':', i.e. `Root:Parent:Child:ExampleString`.
     ///
@@ -19,5 +19,5 @@ pub trait Getter {
     ///
     /// * __Ok__(`T`) - the configuration value with the specified type.
     /// * __Err__(`Error`) - error indicating what went wrong.
-    fn get<T>(filePath: &str, key: &str) -> Result<T, Error>;
+    fn get<T>(file_path: &str, key: &str) -> Result<T, Error>;
 }

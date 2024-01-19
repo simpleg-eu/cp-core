@@ -10,12 +10,12 @@ pub trait Extractor {
     ///
     /// # Arguments
     ///
-    /// * `packageData` - configuration package data bytes.
-    /// * `targetPath` - path into which the extracted files from the package will be stored.
+    /// * `package_data` - configuration package data bytes.
+    /// * `target_path` - path into which the extracted files from the package will be stored.
     ///
     /// # Returns
     ///
     /// * __Ok__(`()`) - successfully extracted `packageData` into the `targetPath`.
     /// * __Err__(`Error`) - error indicating what went wrong.
-    fn extract(packageData: Vec<u8>, targetPath: &str) -> Result<(), Error>;
+    fn extract(package_data: Vec<u8>, target_path: &str) -> Result<(), Error>;
 }
