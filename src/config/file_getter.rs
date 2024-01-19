@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use serde::de::DeserializeOwned;
 use serde_yaml::Value;
 
 use crate::{
