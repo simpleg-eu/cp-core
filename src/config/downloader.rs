@@ -1,5 +1,8 @@
+use async_trait::async_trait;
+
 use crate::error::Error;
 
+#[async_trait]
 /// `Downloader` provides the ability to download a configuration from a remote site.
 pub trait Downloader {
     ///

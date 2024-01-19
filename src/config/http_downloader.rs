@@ -4,6 +4,7 @@
 
 use std::time::Duration;
 
+use async_trait::async_trait;
 use reqwest::Client;
 use tokio::time::timeout;
 
@@ -14,7 +15,7 @@ use crate::error_kind::TIMED_OUT;
 pub struct HttpDownloader {
     access_token: String,
     download_timeout: Duration,
-    client: Client
+    client: Client,
 }
 
 impl HttpDownloader {
@@ -22,11 +23,12 @@ impl HttpDownloader {
         Self {
             access_token,
             download_timeout,
-            client
+            client,
         }
     }
 }
 
+#[async_trait]
 impl Downloader for HttpDownloader {
     async fn download(
         &self,
@@ -35,23 +37,29 @@ impl Downloader for HttpDownloader {
         environment: &str,
         component: &str,
     ) -> Result<Vec<u8>, Error> {
-        let url = format!("{}/config?stage={}&environment={}&component={}", host, stage, environment, component);
+        let url = format!(
+            "{}/config?stage={}&environment={}&component={}",
+            host, stage, environment, component
+        );
 
         let request_builder = self.client.get(url).bearer_auth(self.access_token.clone());
 
         let response = match timeout(self.download_timeout, request_builder.send()).await {
             Ok(result) => match result {
                 Ok(response) => response,
-                Err(error) => return Err(error.into())
+                Err(error) => return Err(error.into()),
             },
             Err(_) => {
-                return Err(Error::new(TIMED_OUT, "configuration download has timed out"))
+                return Err(Error::new(
+                    TIMED_OUT,
+                    "configuration download has timed out",
+                ))
             }
         };
 
         let package_data = match response.bytes().await {
             Ok(package_data) => package_data,
-            Err(error) => return Err(error.into())
+            Err(error) => return Err(error.into()),
         };
 
         return Ok(package_data.to_vec());
@@ -77,12 +85,21 @@ pub mod tests {
     pub async fn download_valid_config_downloads_package() {
         let config = get_config();
         let access_token_secret = config.get("AccessTokenSecret").unwrap().as_str().unwrap();
-        let access_token = get_secrets_manager().unwrap().get_secret(access_token_secret).unwrap();
+        let access_token = get_secrets_manager()
+            .unwrap()
+            .get_secret(access_token_secret)
+            .unwrap();
         let host = config.get("Host").unwrap().as_str().unwrap();
         let stage = config.get("Stage").unwrap().as_str().unwrap();
         let environment = config.get("Environment").unwrap().as_str().unwrap();
         let component = config.get("Component").unwrap().as_str().unwrap();
-        let download_timeout = Duration::from_secs( config.get("DownloadTimeoutInSeconds").unwrap().as_u64().unwrap());
+        let download_timeout = Duration::from_secs(
+            config
+                .get("DownloadTimeoutInSeconds")
+                .unwrap()
+                .as_u64()
+                .unwrap(),
+        );
         let downloader = HttpDownloader::new(access_token, download_timeout, Client::new());
 
         let result = downloader
@@ -101,10 +118,14 @@ pub mod tests {
         let environment = "hahaha";
         let component = "whysoserious";
         let download_timeout = Duration::from_secs(1);
-        let downloader = HttpDownloader::new(access_token.to_string(), download_timeout, Client::new());
+        let downloader =
+            HttpDownloader::new(access_token.to_string(), download_timeout, Client::new());
         let start = Instant::now();
 
-        match downloader.download(host, stage, environment, component).await {
+        match downloader
+            .download(host, stage, environment, component)
+            .await
+        {
             Ok(_) => panic!("expected to fail downloading configuration from non-existent host"),
             Err(error) => {
                 if error.error_kind() != TIMED_OUT {
