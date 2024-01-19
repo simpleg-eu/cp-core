@@ -5,3 +5,4 @@
 pub mod downloader;
 pub mod extractor;
 pub mod getter;
+mod http_downloader;
