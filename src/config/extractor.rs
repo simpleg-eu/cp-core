@@ -17,5 +17,5 @@ pub trait Extractor {
     ///
     /// * __Ok__(`()`) - successfully extracted `packageData` into the `targetPath`.
     /// * __Err__(`Error`) - error indicating what went wrong.
-    fn extract(package_data: Vec<u8>, target_path: &str) -> Result<(), Error>;
+    fn extract(&self, package_data: Vec<u8>, target_path: &str) -> Result<(), Error>;
 }
