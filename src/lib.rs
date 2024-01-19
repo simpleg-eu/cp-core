@@ -1,7 +1,8 @@
 /*
- * Copyright (c) Gabriel Amihalachioaie, SimpleG 2023.
+ * Copyright (c) Gabriel Amihalachioaie, SimpleG 2024.
  */
 
+pub mod config;
 pub mod config_reader;
 pub mod error;
 mod error_kind;
