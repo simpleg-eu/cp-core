@@ -43,6 +43,21 @@ impl FileGetter {
 
         return Ok(current_value.clone());
     }
+
+    fn insert_cache(&mut self, file_path: &str, value: Value) -> Result<&Value, Error> {
+        self.cache.insert(file_path.to_string(), value);
+
+        match self.cache.get(file_path) {
+            Some(value) => Ok(value),
+            None => Err(Error::new(
+                NOT_FOUND,
+                format!(
+                    "could not find file path '{}' within cache after insertion",
+                    &file_path
+                ),
+            )),
+        }
+    }
 }
 
 impl Getter for FileGetter {
@@ -53,21 +68,7 @@ impl Getter for FileGetter {
                 let complete_path = format!("{}/{}", &self.target_path, &file_path);
 
                 match self.config_reader.read(complete_path.into()) {
-                    Ok(value) => {
-                        self.cache.insert(file_path.to_string(), value);
-                        match self.cache.get(file_path) {
-                            Some(value) => value,
-                            None => {
-                                return Err(Error::new(
-                                    NOT_FOUND,
-                                    format!(
-                                    "could not find file path '{}' within cache after insertion",
-                                    &file_path
-                                ),
-                                ))
-                            }
-                        }
-                    }
+                    Ok(value) => self.insert_cache(file_path, value)?,
                     Err(error) => return Err(error),
                 }
             }
@@ -88,8 +89,6 @@ impl Getter for FileGetter {
 
 #[cfg(test)]
 pub mod tests {
-    use serde_json::value;
-
     use crate::{
         config::{file_getter::FileGetter, getter::Getter},
         error_kind::NOT_FOUND,
@@ -99,8 +98,7 @@ pub mod tests {
     #[tokio::test]
     pub async fn get_returns_expected_value() {
         let expected_value: i64 = 5;
-        let target_path = get_unit_test_data_path(file!());
-        let mut getter = FileGetter::new(target_path.to_str().unwrap().to_string());
+        let mut getter = get_getter();
 
         let result = getter
             .get::<i64>("application.yaml", "Example:Inner:Value")
@@ -112,8 +110,7 @@ pub mod tests {
     #[tokio::test]
     pub async fn get_root_key_returns_expected_value() {
         let expected_value = "yes";
-        let target_path = get_unit_test_data_path(file!());
-        let mut getter = FileGetter::new(target_path.to_str().unwrap().to_string());
+        let mut getter = get_getter();
 
         let result = getter
             .get::<String>("application.yaml", "Root")
@@ -125,8 +122,7 @@ pub mod tests {
     #[tokio::test]
     pub async fn get_inner_key_returns_expected_value() {
         let expected_value = true;
-        let target_path = get_unit_test_data_path(file!());
-        let mut getter = FileGetter::new(target_path.to_str().unwrap().to_string());
+        let mut getter = get_getter();
 
         let result = getter
             .get::<bool>("application.yaml", "Example:Yeah")
@@ -137,9 +133,7 @@ pub mod tests {
 
     #[tokio::test]
     pub async fn get_not_existing_key_returns_error() {
-        let target_path = get_unit_test_data_path(file!());
-        let mut getter = FileGetter::new(target_path.to_str().unwrap().to_string());
-
+        let mut getter = get_getter();
         let result = getter.get::<bool>("application.yaml", "Lmao");
 
         assert!(result.is_err());
@@ -148,12 +142,17 @@ pub mod tests {
 
     #[tokio::test]
     pub async fn get_not_existing_file_returns_error() {
-        let target_path = get_unit_test_data_path(file!());
-        let mut getter = FileGetter::new(target_path.to_str().unwrap().to_string());
-
+        let mut getter = get_getter();
         let result = getter.get::<bool>("loooool.yaml", "yes");
 
         assert!(result.is_err());
         assert_eq!(NOT_FOUND, result.unwrap_err().error_kind());
+    }
+
+    fn get_getter() -> FileGetter {
+        let target_path = get_unit_test_data_path(file!());
+        let getter = FileGetter::new(target_path.to_str().unwrap().to_string());
+
+        getter
     }
 }
