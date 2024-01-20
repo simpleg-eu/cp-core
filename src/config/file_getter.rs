@@ -16,7 +16,7 @@ pub struct FileGetter {
 }
 
 impl FileGetter {
-    fn new(target_path: String) -> Self {
+    pub fn new(target_path: String) -> Self {
         Self {
             target_path,
             config_reader: ConfigReader::default(),
