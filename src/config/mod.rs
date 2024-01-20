@@ -3,6 +3,7 @@
  */
 
 pub mod client;
+pub mod default_client_factory;
 pub mod downloader;
 pub mod extractor;
 pub mod file_getter;
