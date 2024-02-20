@@ -1,4 +1,4 @@
-use std::{env, time::Duration};
+use std::time::Duration;
 
 use crate::{
     config::{
@@ -6,7 +6,6 @@ use crate::{
         zip_extractor::ZipExtractor,
     },
     error::Error,
-    error_kind::NOT_FOUND,
 };
 
 const CP_CONFIG_ACCESS_TOKEN_ENV: &str = "CP_CONFIG_ACCESS_TOKEN";
