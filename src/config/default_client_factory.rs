@@ -8,8 +8,6 @@ use crate::{
     error::Error,
 };
 
-const CP_CONFIG_ACCESS_TOKEN_ENV: &str = "CP_CONFIG_ACCESS_TOKEN";
-
 pub fn build(
     access_token: String,
     host: String,
