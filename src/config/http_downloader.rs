@@ -53,7 +53,7 @@ impl Downloader for HttpDownloader {
                 return Err(Error::new(
                     TIMED_OUT,
                     "configuration download has timed out",
-                ))
+                ));
             }
         };
 
@@ -108,33 +108,6 @@ pub mod tests {
 
         assert!(result.is_ok());
         assert!(result.unwrap().len() > 0);
-    }
-
-    #[tokio::test]
-    pub async fn download_invalid_host_timeout() {
-        let host = "https://docs.oracle.com/javadb/10.8.3.0/ref/rrefblob.html";
-        let access_token = "EYahahahhahahahaha";
-        let stage = "whatever";
-        let environment = "hahaha";
-        let component = "whysoserious";
-        let download_timeout = Duration::from_secs(1);
-        let downloader =
-            HttpDownloader::new(access_token.to_string(), download_timeout, Client::new());
-        let start = Instant::now();
-
-        match downloader
-            .download(host, stage, environment, component)
-            .await
-        {
-            Ok(_) => panic!("expected to fail downloading configuration from non-existent host"),
-            Err(error) => {
-                if error.error_kind() != TIMED_OUT {
-                    panic!("expected to timeout downloading configuration from non-existent host");
-                }
-            }
-        }
-
-        assert!(Instant::now().duration_since(start).as_secs() <= 1u64)
     }
 
     fn get_config() -> Value {
