@@ -39,6 +39,14 @@ jobs:
 
     if: ${{ needs.changes.outputs.src == 'true' || needs.changes.outputs.test == 'true' }}
     steps:
+      - name: Checkout cp-config
+        uses: actions/checkout@v3
+        with:
+          repository: 'simpleg-eu/cp-config'
+          sparse-checkout: 'docker-compose.yaml'
+      - name: Run cp-config in background
+        run: |
+          docker-compose up -d
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Replace placeholder version
