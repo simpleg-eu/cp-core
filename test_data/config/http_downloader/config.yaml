@@ -1,5 +1,5 @@
 AccessTokenSecret: "1dc69a8e-d602-4ba7-9d22-b0c60186036a"
-Host: "https://s1.simpleg.eu/cp-config"
+Host: "http://localhost"
 Stage: "main"
 Environment: "development"
 Component: "dummy"
